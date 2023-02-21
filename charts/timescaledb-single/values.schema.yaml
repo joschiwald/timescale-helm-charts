@@ -620,3 +620,5 @@ definitions:
         type: array
         items:
           type: string
+      existingClaim:
+        type: string
