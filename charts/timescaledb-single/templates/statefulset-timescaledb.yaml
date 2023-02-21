@@ -7,7 +7,7 @@ metadata:
   name: {{ template "timescaledb.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-    {{ include "timescaledb-helm.labels" . | nindent 4 }}
+    {{- include "timescaledb-helm.labels" . | nindent 4 }}
     app.kubernetes.io/component: timescaledb
 spec:
   serviceName: {{ template "timescaledb.fullname" . }}
@@ -28,13 +28,13 @@ spec:
       {{- if .Values.podLabels }}
         {{ toYaml .Values.podLabels | nindent 8 }}
       {{- end }}
-      {{- if .Values.podAnnotations }}
       annotations:
-        {{ toYaml .Values.podAnnotations | nindent 8 }}
+        {{- if .Values.podAnnotations }}
+        {{- toYaml .Values.podAnnotations | nindent 8 }}
+        {{- end }}
         {{- if .Values.timescaledbTune.enabled }}
         checksum/tstune-args: "{{ printf "%s" .Values.timescaledbTune.args | sha256sum }}"
         {{- end }}
-      {{- end }}
     spec:
       serviceAccountName: {{ template "timescaledb.serviceAccountName" . }}
       securityContext:
@@ -544,11 +544,8 @@ spec:
           {{ toYaml .Values.persistentVolumes.data.annotations | nindent 10 }}
         {{- end }}
         labels:
-          app: {{ template "timescaledb.fullname" . }}
-          release: {{ .Release.Name }}
-          heritage: {{ .Release.Service }}
-          cluster-name: {{ template "clusterName" . }}
-          purpose: data-directory
+          {{- include "timescaledb-helm.labels" . | nindent 10 }}
+          app.kubernetes.io/component: data-directory
       spec:
         accessModes:
           {{ toYaml .Values.persistentVolumes.data.accessModes | nindent 8 }}
@@ -571,11 +568,8 @@ spec:
           {{ toYaml .Values.persistentVolumes.wal.annotations | nindent 10 }}
         {{- end }}
         labels:
-          app: {{ template "timescaledb.fullname" . }}
-          release: {{ .Release.Name }}
-          heritage: {{ .Release.Service }}
-          cluster-name: {{ template "clusterName" . }}
-          purpose: wal-directory
+          {{- include "timescaledb-helm.labels" . | nindent 10 }}
+          app.kubernetes.io/component: wal-directory
       spec:
         accessModes:
           {{ toYaml .Values.persistentVolumes.wal.accessModes | nindent 8 }}
@@ -596,12 +590,9 @@ spec:
         annotations:
           {{ $volume.annotations | default dict | toYaml | nindent 10 }}
         labels:
-          app: {{ template "timescaledb.fullname" $ }}
-          release: {{ $.Release.Name }}
-          heritage: {{ $.Release.Service }}
-          cluster-name: {{ template "clusterName" $ }}
-          tablespace: {{ $tablespaceName }}
-          purpose: tablespace
+          {{- include "timescaledb-helm.labels" $ | nindent 10 }}
+          app.kubernetes.io/component: tablespace
+          timescale.com/tablespace: {{ $tablespaceName }}
       spec:
         accessModes:
           {{ $volume.accessModes | default (list "ReadWriteOnce") | toYaml | nindent 8 }}
