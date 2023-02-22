@@ -27,6 +27,8 @@ __SQL__
 for tablespace in $POSTGRES_TABLESPACES
 do
     log "Creating tablespace ${tablespace}"
+    # FIX ME: PGDATA points to the wrong directory
+    # "${PGDATA}/tablespaces" should be replaced with {{ include "tablespaces_dir" . }}
     tablespacedir="${PGDATA}/tablespaces/${tablespace}/data"
     psql -d "$URL" --set tablespace="${tablespace}" --set directory="${tablespacedir}" --set ON_ERROR_STOP=1 <<__SQL__
     SET synchronous_commit to 'off';
