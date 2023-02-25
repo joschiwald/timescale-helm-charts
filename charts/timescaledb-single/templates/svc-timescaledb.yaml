@@ -7,9 +7,9 @@ metadata:
   name: {{ template "clusterName" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-    role: master
-    {{ include "timescaledb-helm.labels" . | nindent 4 }}
+    {{ include "timescaledb.labels" . | nindent 4 }}
     app.kubernetes.io/component: timescaledb
+    timescale.com/role: master
 {{- if .Values.service.primary.labels }}
 {{ .Values.service.primary.labels | toYaml | indent 4 }}
 {{- end }}
@@ -19,9 +19,9 @@ metadata:
 {{- end }}
 spec:
   selector:
-    app: {{ template "timescaledb.fullname" . }}
-    cluster-name: {{ template "clusterName" . }}
-    role: master
+    {{ include "timescaledb.selectorLabels" . }}
+    timescale.com/cluster-name: {{ template "clusterName" . }}
+    timescale.com/role: master
   type: {{ .Values.service.primary.type }}
   ports:
 {{- if .Values.pgBouncer.enabled }}

@@ -7,10 +7,9 @@ metadata:
   name: {{ template "clusterName" . }}-replica
   namespace: {{ .Release.Namespace }}
   labels:
-    component: postgres
-    role: replica
-    {{ include "timescaledb-helm.labels" . | nindent 4 }}
-    app.kubernetes.io/component: postgres
+    {{ include "timescaledb.labels" . | nindent 4 }}
+    app.kubernetes.io/component: timescaledb
+    timescale.com/role: replica
 {{- if .Values.service.replica.labels }}
 {{ .Values.service.replica.labels | toYaml | indent 4 }}
 {{- end }}
@@ -20,9 +19,9 @@ metadata:
 {{- end }}
 spec:
   selector:
-    app: {{ template "timescaledb.fullname" . }}
-    cluster-name: {{ template "clusterName" . }}
-    role: replica
+    {{ include "timescaledb.selectorLabels" . }}
+    timescale.com/cluster-name: {{ template "clusterName" . }}
+    timescale.com/role: replica
   type: {{ .Values.service.replica.type }}
   ports:
 {{- if .Values.pgBouncer.enabled }}

@@ -257,8 +257,8 @@ patroni:
       retry_timeout: 10
       ttl: 30
   kubernetes:
-    role_label: role
-    scope_label: cluster-name
+    role_label: timescale.com/role
+    scope_label: timescale.com/cluster-name
     use_endpoints: true
   postgresql:
     create_replica_methods:

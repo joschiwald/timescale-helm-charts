@@ -9,16 +9,16 @@ metadata:
   name: {{ template "timescaledb.fullname" . }}-backup
   namespace: {{ .Release.Namespace }}
   labels:
-    {{ include "timescaledb-helm.labels" . | nindent 4 }}
+    {{ include "timescaledb.labels" . | nindent 4 }}
     app.kubernetes.io/component: backup
 spec:
   ports:
   - port: 8081
     protocol: TCP
   selector:
-    app: {{ template "timescaledb.fullname" . }}
-    role: master
-    cluster-name: {{ template "clusterName" . }}
+    {{ include "timescaledb.selectorLabels" . }}
+    timescale.com/role: master
+    timescale.com/cluster-name: {{ template "clusterName" . }}
 ...
 {{- range .Values.backup.jobs }}
 ---
@@ -31,26 +31,26 @@ kind: CronJob
 metadata:
   name: {{ template "timescaledb.fullname" $ }}-{{ .name }}
   labels:
-    backup-type: {{ .type }}
-    {{ include "timescaledb-helm.labels" $ | nindent 4 }}
+    {{ include "timescaledb.labels" $ | nindent 4 }}
     app.kubernetes.io/component: backup
+    timescale.com/backup-type: {{ .type }}
 spec:
   schedule: {{ quote .schedule }}
   concurrencyPolicy: Forbid
   jobTemplate:
     metadata:
       labels:
-        app: {{ template "timescaledb.fullname" $ }}
-        backup-type: {{ .type }}
-        cluster-name: {{ template "clusterName" $ }}
+        {{ include "timescaledb.selectorLabels" $ }}
+        timescale.com/backup-type: {{ .type }}
+        timescale.com/cluster-name: {{ template "clusterName" $ }}
     spec:
       activeDeadlineSeconds: 60
       template:
         metadata:
           labels:
-            app: {{ template "timescaledb.fullname" $ }}
-            backup-type: {{ .type }}
-            cluster-name: {{ template "clusterName" $ }}
+            {{ include "timescaledb.selectorLabels" $ }}
+            timescale.com/backup-type: {{ .type }}
+            timescale.com/cluster-name: {{ template "clusterName" $ }}
         spec:
           restartPolicy: OnFailure
           containers:

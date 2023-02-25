@@ -42,17 +42,17 @@ However if you need to keep the default behavior, please add the similar value y
         topologyKey: "kubernetes.io/hostname"
         labelSelector:
           matchLabels:
-            app: '{{ template "timescaledb.fullname" . }}'
-            release: "{{ .Release.Name | quote }}"
-            cluster-name: '{{ template "clusterName" . }}'
+            app.kubernetes.io/name: {{ template "timescaledb.fullname" . }}
+            app.kubernetes.io/instance: {{ .Release.Name | quote }}
+            timescale.com/cluster-name: {{ template "clusterName" . }}
     - weight: 50
       podAffinityTerm:
         topologyKey: failure-domain.beta.kubernetes.io/zone
         labelSelector:
           matchLabels:
-            app: {{ template "timescaledb.fullname" . }}
-            release: {{ .Release.Name | quote }}
-            cluster-name: {{ template "clusterName" . }}
+            app.kubernetes.io/name: {{ template "timescaledb.fullname" . }}
+            app.kubernetes.io/instance: {{ .Release.Name | quote }}
+            timescale.com/cluster-name: {{ template "clusterName" . }}
 ```
 
 If you need to keep this rule, please add it to your `affinity` field.
@@ -192,7 +192,7 @@ kind: Secret
 metadata:
   labels:
     app: ${TSRELEASE}-timescaledb
-    cluster-name: ${TSRELEASE}
+    timescale.com/cluster-name: ${TSRELEASE}
   name: ${TSRELEASE}-credentials
 data:
   PATRONI_REPLICATION_PASSWORD: |
@@ -212,7 +212,7 @@ kind: Secret
 metadata:
   labels:
     app: ${TSRELEASE}-timescaledb
-    cluster-name: ${TSRELEASE}
+    timescale.com/cluster-name: ${TSRELEASE}
   name: ${TSRELEASE}-certificate
 type: kubernetes.io/tls
 data:
@@ -231,7 +231,7 @@ kind: Secret
 metadata:
   labels:
     app: ${TSRELEASE}-timescaledb
-    cluster-name: ${TSRELEASE}
+    timescale.com/cluster-name: ${TSRELEASE}
   name: ${TSRELEASE}-pgbackrest
 data: {}
 __EOT__

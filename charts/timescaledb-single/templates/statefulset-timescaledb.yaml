@@ -7,7 +7,7 @@ metadata:
   name: {{ template "timescaledb.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "timescaledb-helm.labels" . | nindent 4 }}
+    {{- include "timescaledb.labels" . | nindent 4 }}
     app.kubernetes.io/component: timescaledb
 spec:
   serviceName: {{ template "timescaledb.fullname" . }}
@@ -17,13 +17,12 @@ spec:
     type: RollingUpdate
   selector:
     matchLabels:
-      app: {{ template "timescaledb.fullname" . }}
-      release: {{ .Release.Name }}
+      {{ include "timescaledb.selectorLabels" . }}
   template:
     metadata:
       name: {{ template "timescaledb.fullname" . }}
       labels:
-        {{ include "timescaledb-helm.labels" . | nindent 8 }}
+        {{ include "timescaledb.labels" . | nindent 8 }}
         app.kubernetes.io/component: timescaledb
       {{- if .Values.podLabels }}
         {{ toYaml .Values.podLabels | nindent 8 }}
@@ -206,7 +205,7 @@ spec:
         - name: PATRONI_KUBERNETES_NAMESPACE
           value: {{ $.Release.Namespace }}
         - name: PATRONI_KUBERNETES_LABELS
-          value: {{ printf "{app: %s, cluster-name: %s, release: %s}" (include "timescaledb.fullname" .) (include "clusterName" .) .Release.Name  | quote }}
+          value: {{ printf "{app.kubernetes.io/name: %s, app.kubernetes.io/instance: %s, timescale.com/cluster-name: %s}" (include "timescaledb.fullname" .) (.Release.Name  | quote) (include "clusterName" .) }}
         - name: PATRONI_SCOPE
           value: {{ template "clusterName" . }}
         {{- if .Values.persistentVolumes.tablespaces }}
@@ -446,8 +445,9 @@ spec:
         env:
         - name: DATA_SOURCE_NAME
           value: "host=/var/run/postgresql user=postgres application_name=postgres_exporter"
+        # TODO: FIX THIS
         - name: PG_EXPORTER_CONSTANT_LABELS
-          value: release={{ .Release.Name }},namespace={{ .Release.Namespace }}
+          value: app.kubernetes.io/instance={{ .Release.Name }},namespace={{ .Release.Namespace }}
         {{- if .Values.prometheus.env }}
         {{ .Values.prometheus.env | default list | toYaml | nindent 8 }}
         {{- end }}
@@ -544,7 +544,7 @@ spec:
           {{ toYaml .Values.persistentVolumes.data.annotations | nindent 10 }}
         {{- end }}
         labels:
-          {{- include "timescaledb-helm.labels" . | nindent 10 }}
+          {{- include "timescaledb.labels" . | nindent 10 }}
           app.kubernetes.io/component: data-directory
       spec:
         accessModes:
@@ -568,7 +568,7 @@ spec:
           {{ toYaml .Values.persistentVolumes.wal.annotations | nindent 10 }}
         {{- end }}
         labels:
-          {{- include "timescaledb-helm.labels" . | nindent 10 }}
+          {{- include "timescaledb.labels" . | nindent 10 }}
           app.kubernetes.io/component: wal-directory
       spec:
         accessModes:
@@ -590,7 +590,7 @@ spec:
         annotations:
           {{ $volume.annotations | default dict | toYaml | nindent 10 }}
         labels:
-          {{- include "timescaledb-helm.labels" $ | nindent 10 }}
+          {{- include "timescaledb.labels" $ | nindent 10 }}
           app.kubernetes.io/component: tablespace
           timescale.com/tablespace: {{ $tablespaceName }}
       spec:

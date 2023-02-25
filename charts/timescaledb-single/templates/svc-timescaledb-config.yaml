@@ -21,13 +21,12 @@ metadata:
   name: {{ template "clusterName" . }}-config
   namespace: {{ .Release.Namespace }}
   labels:
-    component: patroni
-    {{ include "timescaledb-helm.labels" . | nindent 4 }}
+    {{ include "timescaledb.labels" . | nindent 4 }}
     app.kubernetes.io/component: patroni
 spec:
   selector:
-    app: {{ template "timescaledb.fullname" . }}
-    cluster-name: {{ template "clusterName" . }}
+    {{ include "timescaledb.selectorLabels" . }}
+    timescale.com/cluster-name: {{ template "clusterName" . }}
   type: ClusterIP
   clusterIP: None
   ports:
