@@ -353,6 +353,8 @@ properties:
           type: object
       image:
         type: object
+      resources:
+        "$ref": "#/definitions/resources"
       volumes:
         type:
           - array
@@ -413,6 +415,8 @@ properties:
         type:
           - object
           - "null"
+      resources:
+        "$ref": "#/definitions/resources"
   nodeSelector:
     type: object
   podAnnotations:
