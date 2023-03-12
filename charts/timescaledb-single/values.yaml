@@ -446,6 +446,7 @@ timescaledbTune:
     # max-conns: 120
     # cpus: 5
     # memory: 4GB
+    # wal-disk-size: 1GB
 
 # pgBouncer does connection pooling for PostgreSQL
 # https://www.pgbouncer.org/
