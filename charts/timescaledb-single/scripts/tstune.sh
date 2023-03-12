@@ -11,17 +11,6 @@ set -eu
 : "$RESOURCES_CPU_LIMIT"
 : "$RESOURCES_MEMORY_LIMIT"
 
-# Figure out how many cores are available
-CPUS="$RESOURCES_CPU_REQUESTS"
-if [ "$RESOURCES_CPU_REQUESTS" -eq 0 ]; then
-    CPUS="${RESOURCES_CPU_LIMIT}"
-fi
-# Figure out how much memory is available
-MEMORY="$RESOURCES_MEMORY_REQUESTS"
-if [ "$RESOURCES_MEMORY_REQUESTS" -eq 0 ]; then
-    MEMORY="${RESOURCES_MEMORY_LIMIT}"
-fi
-
 # Ensure tstune config file exists
 touch "${TSTUNE_FILE}"
 
@@ -30,6 +19,8 @@ if [ -f "${PGDATA}/postgresql.base.conf" ] && ! grep "include_if_exists = '${TST
     echo "include_if_exists = '${TSTUNE_FILE}'" >> "${PGDATA}/postgresql.base.conf"
 fi
 
+CPUS="$RESOURCES_CPU_LIMIT"
+MEMORY="${RESOURCES_MEMORY_LIMIT}"
 WAL_VOLUME_SIZE=$(numfmt --from=auto "${WAL_VOLUME_SIZE}")
 
 # Run tstune
