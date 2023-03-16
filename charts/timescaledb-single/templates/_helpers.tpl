@@ -97,5 +97,6 @@ cluster-name: {{ template "clusterName" . }}
 {{- define "timescaledb-helm.labels" -}}
 {{ include "timescaledb.labels" . }}
 app.kubernetes.io/name: {{ include "timescaledb.fullname" . | quote }}
+app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/version: {{ .Chart.Version }}
 {{- end }}
